@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora con Árbol Binario</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .calculator {
+            background: #1e272e;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.3);
+            width: 320px;
+            position: relative;
+        }
+
+        #display {
+            width: 100%;
+            height: 50px;
+            text-align: right;
+            margin-bottom: 15px;
+            background: #2f3640;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            font-size: 24px;
+            border-radius: 10px;
+            box-sizing: border-box;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-gap: 10px;
+        }
+
+        button {
+            background: #3d3d3d;
+            border: none;
+            border-radius: 10px;
+            height: 60px;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+            transition: background 0.3s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            background: #4a4a4a;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .tree-button {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            background: #ff6348;
+            color: white;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .tree-button:hover {
+            background: #ff7f66;
+        }
+
+        /* Tabla de tokens y tipos */
+        .tokens-table {
+            margin-left: 40px;
+            background-color: #333;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.3);
+            width: 250px;
+        }
+
+        .tokens-table h3 {
+            text-align: center;
+            color: white;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            text-align: left;
+            margin-top: 10px;
+            border-collapse: collapse;
+            color: #fff;
+        }
+
+        th, td {
+            padding: 8px;
+            border-bottom: 1px solid #444;
+        }
+
+        th {
+            background-color: #555;
+        }
+
+        /* Estilo de contenedor principal */
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="calculator">
+            <input type="text" id="display" disabled />
+            <div class="buttons">
+                <button onclick="appendValue('(')"> ( </button>
+                <button onclick="appendValue(')')"> ) </button>
+                <button onclick="clearDisplay()"> C </button>
+                <button onclick="appendValue('/')"> ÷ </button>
+                <button onclick="appendValue('7')"> 7 </button>
+                <button onclick="appendValue('8')"> 8 </button>
+                <button onclick="appendValue('9')"> 9 </button>
+                <button onclick="appendValue('*')"> × </button>
+                <button onclick="appendValue('4')"> 4 </button>
+                <button onclick="appendValue('5')"> 5 </button>
+                <button onclick="appendValue('6')"> 6 </button>
+                <button onclick="appendValue('-')"> − </button>
+                <button onclick="appendValue('1')"> 1 </button>
+                <button onclick="appendValue('2')"> 2 </button>
+                <button onclick="appendValue('3')"> 3 </button>
+                <button onclick="appendValue('+')"> + </button>
+                <button onclick="appendValue('0')"> 0 </button>
+                <button onclick="appendValue('.')"> . </button>
+                <button onclick="evaluateExpression()"> = </button>
+            </div>
+
+            <button class="tree-button" onclick="generateTree()">TREE</button>
+        </div>
+
+        <div class="tokens-table">
+            <h3>Tokens y Tipos</h3>
+            <table id="tokensTable">
+                <tr>
+                    <th>Token</th>
+                    <th>Tipo</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let tokensTable = document.getElementById('tokensTable');
+
+        function appendValue(value) {
+            display.value += value;
+        }
+
+        function evaluateExpression() {
+            const expression = display.value;
+            captureTokens(expression);
+            const result = eval(expression);
+            display.value = result;
+        }
+
+        function clearDisplay() {
+            display.value = '';
+        }
+
+        function generateTree() {
+            const treeWindow = window.open('', 'Árbol Binario', 'width=800,height=600');
+            treeWindow.document.write(`
+                <html>
+                <head>
+                    <title>Árbol Binario</title>
+                    <style>
+                        body { display: flex; align-items: center; justify-content: center; height: 100vh; background: #0f2027; }
+                        .tree-container { position: relative; width: 600px; height: 400px; }
+                        .node { 
+                            position: absolute; 
+                            background-color: #FF7043; 
+                            border-radius: 50%; 
+                            width: 50px; 
+                            height: 50px; 
+                            display: flex; 
+                            justify-content: center; 
+                            align-items: center; 
+                            color: white; 
+                            font-size: 18px; 
+                            font-weight: bold; 
+                        }
+                        .line { 
+                            position: absolute; 
+                            background-color: white; 
+                            height: 2px; 
+                            transform-origin: 0 50%; 
+                        }
+                        .node-19-5 { top: 20px; left: 275px; }
+                        .node-mult { top: 120px; left: 200px; }
+                        .node-2 { top: 120px; left: 350px; }
+                        .node-plus { top: 220px; left: 125px; }
+                        .node-3 { top: 220px; left: 275px; }
+                        .node-8 { top: 320px; left: 75px; }
+                        .node-5 { top: 320px; left: 175px; }
+                        .line-19-5-mult { width: 110px; top: 45px; left: 275px; transform: rotate(45deg); }
+                        .line-19-5-2 { width: 110px; top: 45px; left: 325px; transform: rotate(-45deg); }
+                        .line-mult-plus { width: 110px; top: 145px; left: 200px; transform: rotate(45deg); }
+                        .line-mult-3 { width: 110px; top: 145px; left: 250px; transform: rotate(-45deg); }
+                        .line-plus-8 { width: 80px; top: 245px; left: 125px; transform: rotate(45deg); }
+                        .line-plus-5 { width: 80px; top: 245px; left: 175px; transform: rotate(-45deg); }
+                    </style>
+                </head>
+                <body>
+                    <div class="tree-container">
+                        <div class="node node-19-5">19/5</div>
+                        <div class="node node-mult">*</div>
+                        <div class="node node-2">2</div>
+                        <div class="node node-plus">+</div>
+                        <div class="node node-3">3</div>
+                        <div class="node node-8">8</div>
+                        <div class="node node-5">5</div>
+                        <div class="line line-19-5-mult"></div>
+                        <div class="line line-19-5-2"></div>
+                        <div class="line line-mult-plus"></div>
+                        <div class="line line-mult-3"></div>
+                        <div class="line line-plus-8"></div>
+                        <div class="line line-plus-5"></div>
+                    </div>
+                </body>
+                </html>
+            `);
+        }
+
+        function captureTokens(expression) {
+            tokensTable.innerHTML = '<tr><th>Token</th><th>Tipo</th></tr>'; 
+            const tokens = expression.match(/\d+|\D/g);
+            tokens.forEach(token => {
+                const type = isNaN(token) ? 'Operador' : 'Número';
+                tokensTable.innerHTML += `<tr><td>${token}</td><td>${type}</td></tr>`;
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Árbol Binario</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #ff0000, #203a43, #2c5364);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            margin: 0;
+        }
+
+        .tree-container {
+            position: relative;
+            width: 800px;
+            height: 500px;
+            background-color: #1e272e;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .node {
+            position: absolute;
+            background-color: #3d3d3d;
+            color: white;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .line {
+            position: absolute;
+            width: 2px;
+            background-color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="tree-container" id="treeContainer"></div>
+    <script>
+        const treeData = JSON.parse(localStorage.getItem('treeData'));
+        const treeContainer = document.getElementById('treeContainer');
+
+        function createNode(value, top, left) {
+            const node = document.createElement('div');
+            node.className = 'node';
+            node.style.top = top + 'px';
+            node.style.left = left + 'px';
+            node.textContent = value;
+            return node;
+        }
+
+        function createLine(x1, y1, x2, y2) {
+            const length = Math.hypot(x2 - x1, y2 - y1);
+            const angle = Math.atan2(y2 - y1, x2 - x1) * (180 / Math.PI);
+            const line = document.createElement('div');
+            line.className = 'line';
+            line.style.width = length + 'px';
+            line.style.top = y1 + 'px';
+            line.style.left = x1 + 'px';
+            line.style.transform = `rotate(${angle}deg)`;
+            return line;
+        }
+
+        function renderTree(node, x, y, offsetX) {
+            if (node) {
+                const currentNode = createNode(node.value, y, x);
+                treeContainer.appendChild(currentNode);
+
+                if (node.left) {
+                    const leftX = x - offsetX;
+                    const leftY = y + 80;
+                    const line = createLine(x + 25, y + 50, leftX + 25, leftY);
+                    treeContainer.appendChild(line);
+                    renderTree(node.left, leftX, leftY, offsetX / 2);
+                }
+
+                if (node.right) {
+                    const rightX = x + offsetX;
+                    const rightY = y + 80;
+                    const line = createLine(x + 25, y + 50, rightX + 25, rightY);
+                    treeContainer.appendChild(line);
+                    renderTree(node.right, rightX, rightY, offsetX / 2);
+                }
+            }
+        }
+
+        if (treeData) {
+            renderTree(treeData, 350, 20, 200);
+        } else {
+            treeContainer.innerText = "No hay datos para mostrar.";
+        }
+    </script>
+</body>
+</html>
